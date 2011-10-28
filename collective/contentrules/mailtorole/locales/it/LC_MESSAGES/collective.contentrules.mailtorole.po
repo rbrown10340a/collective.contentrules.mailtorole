@@ -1,0 +1,38 @@
+# Paolo Melchiorre <paolo@melchiorre.org>, 2008.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2008-10-02 10:46+0000\n"
+"PO-Revision-Date: 2008-11-17 18:31+0100\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: it\n"
+"Language-Name: Italian\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: DOMAIN\n"
+
+#: ./actions/mail.py:37
+msgid "Acquired Roles"
+msgstr "Ruoli acquisiti"
+
+#: ./actions/mail.py:63
+msgid "Email report to users with role ${role} on the object"
+msgstr "Email all'utente con ruolo ${role} sull'oggetto"
+
+#: ./actions/mail.py:31
+msgid "field_role_title"
+msgstr "Ruolo"
+
+#: ./actions/mail.py:32
+msgid "field_role_description"
+msgstr "Seleziona un ruolo. L'azione controlla tutti gli utenti del portale Plone che hanno questo ruolo sull'oggetto ed invia un messaggio al loro indirizzo email."
+
+#: ./actions/mail.py:38
+msgid "Should users that have this role as an acquired role also receive this email?"
+msgstr "Anche gli utenti che hanno questo ruolo come ruolo acquisito dovranno ricevere questa email?"
+
