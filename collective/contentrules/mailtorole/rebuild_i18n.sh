@@ -11,7 +11,7 @@ I18NDOMAIN=$PRODUCTNAME
 # Also merge it with generated.pot, which includes the items
 # from schema.py
 
-$I18NDUDE rebuild-pot --pot locales/${PRODUCTNAME}.pot --create ${I18NDOMAIN} .
+$I18NDUDE rebuild-pot --pot locales/${PRODUCTNAME}.pot --create ${I18NDOMAIN} --merge locales/manual.pot .
 
 # Synchronise the resulting .pot with the Dutch .po files
 $I18NDUDE sync --pot locales/${PRODUCTNAME}.pot locales/nl/LC_MESSAGES/${PRODUCTNAME}.po

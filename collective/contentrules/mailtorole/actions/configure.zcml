@@ -3,7 +3,7 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:five="http://namespaces.zope.org/five"
-    i18n_domain="collective.contentrules.mailtorole">
+    >
 
     <include package="Products.CMFCore" file="permissions.zcml" />
     <include package="plone.contentrules" />
@@ -34,7 +34,7 @@
 
      <plone:ruleAction
          name="plone.actions.MailRole"
-         title="Send email to users with a role on the object"
+         title="Send email to role"
          description="Send an email on the triggering object"
          for="*"
          event="zope.component.interfaces.IObjectEvent"
@@ -43,4 +43,5 @@
          schema=".mail.IMailRoleAction"
          factory=".mail.MailRoleAction"
          />
+
 </configure>

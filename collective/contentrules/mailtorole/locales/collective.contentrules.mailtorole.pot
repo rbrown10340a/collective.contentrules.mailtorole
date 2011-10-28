@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2008-10-02 10:46+0000\n"
+"POT-Creation-Date: 2011-10-28 11:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,51 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: collective.contentrules.mailtorole\n"
 
-#: ./actions/mail.py:37
-msgid "Acquired Roles"
-msgstr ""
-
-#: ./actions/mail.py:63
+#: ./actions/mail.py:78
 msgid "Email report to users with role ${role} on the object"
 msgstr ""
 
-#: ./actions/mail.py:31
-msgid "field_role_title"
+#: ./actions/configure.zcml
+msgid "Send email to role"
 msgstr ""
 
-#: ./actions/mail.py:32
+#. Default: "Should users that have this role as an acquired role also receive this email?"
+#: ./actions/mail.py:42
+msgid "field_acquired_description"
+msgstr ""
+
+#. Default: "Acquired Roles"
+#: ./actions/mail.py:41
+msgid "field_acquired_title"
+msgstr ""
+
+#. Default: "Should users that have this role as a role in the whole site also receive this email?"
+#: ./actions/mail.py:48
+msgid "field_global_roles_description"
+msgstr ""
+
+#. Default: "Global Roles"
+#: ./actions/mail.py:47
+msgid "field_global_roles_title"
+msgstr ""
+
+#. Default: "Type in here the message that you want to mail. Some defined content can be replaced: ${title} will be replaced by the title of the newly created item. ${url} will be replaced by the URL of the newly created item."
+#: ./actions/mail.py:54
+msgid "field_message_description"
+msgstr ""
+
+#. Default: "Select a role. The action will look up the all Plone site users who explicitly have this role on the object and send a message to their email address."
+#: ./actions/mail.py:35
 msgid "field_role_description"
 msgstr ""
 
-#: ./actions/mail.py:38
-msgid "Should users that have this role as an acquired role also receive this email?"
+#. Default: "Role"
+#: ./actions/mail.py:34
+msgid "field_role_title"
+msgstr ""
+
+#. Default: "A mail action that can mail plone users who have a role on the object"
+#: ./actions/mail.py:204
+msgid "form_description"
 msgstr ""
 

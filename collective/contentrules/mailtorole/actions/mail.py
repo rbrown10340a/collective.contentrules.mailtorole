@@ -38,18 +38,21 @@ role on the object and send a message to their email address."),
         vocabulary="collective.contentrules.mailtorole.roles",
         required=True)
     acquired = schema.Bool(
-        title=_(u"Acquired Roles"),
-        description=_("Should users that have this \
+        title=_(u'field_acquired_title', default=u"Acquired Roles"),
+        description=_(u'field_acquired_description', 
+            default=u"Should users that have this \
 role as an acquired role also receive this email?"),
         required=False)
     global_roles = schema.Bool(
-        title=_(u"Global Roles"),
-        description=_("Should users that have this \
+        title=_(u'field_global_roles_title', default=u"Global Roles"),
+        description=_(u'field_global_roles_description', 
+            default=u"Should users that have this \
 role as a role in the whole site also receive this email?"),
         required=False)
     message = schema.Text(
         title=_plone(u"Message"),
-        description=_plone(u"Type in here the message that you \
+        description=_(u'field_message_description', 
+            default=u"Type in here the message that you \
 want to mail. Some defined content can be replaced: ${title} will be replaced \
 by the title of the newly created item. ${url} will be replaced by the \
 URL of the newly created item."),
@@ -198,8 +201,9 @@ class MailRoleAddForm(AddForm):
     """
     form_fields = form.FormFields(IMailRoleAction)
     label = _plone(u"Add Mail Action")
-    description = _plone(u"A mail action that can mail plone users who have "
-                         u"a role on the object")
+    description = _(u'form_description', 
+        default=u"A mail action that can mail plone users who have "
+                u"a role on the object")
     form_name = _plone(u"Configure element")
 
     def create(self, data):
