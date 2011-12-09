@@ -177,8 +177,12 @@ action or enter an email in the portal properties")
         # look up e-mail addresses for the found users
         recipients_mail = set()
         for user in recipients:
-            recipient_prop = membertool.getMemberById(
-                user).getProperty('email')
+            member = membertool.getMemberById(user)
+            # check whether user really exists
+            # before getting its email address
+            if not member:
+                continue
+            recipient_prop = member.getProperty('email')
             if recipient_prop != None and len(recipient_prop) > 0:
                 recipients_mail.add(recipient_prop)
 
