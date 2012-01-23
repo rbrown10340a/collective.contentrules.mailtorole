@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.4 (unreleased)
+1.4 (2012-01-23)
 ----------------
 
 - Fix Plone3 compatibility [toutpt]
