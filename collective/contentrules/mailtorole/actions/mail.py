@@ -39,19 +39,19 @@ role on the object and send a message to their email address."),
         required=True)
     acquired = schema.Bool(
         title=_(u'field_acquired_title', default=u"Acquired Roles"),
-        description=_(u'field_acquired_description', 
+        description=_(u'field_acquired_description',
             default=u"Should users that have this \
 role as an acquired role also receive this email?"),
         required=False)
     global_roles = schema.Bool(
         title=_(u'field_global_roles_title', default=u"Global Roles"),
-        description=_(u'field_global_roles_description', 
+        description=_(u'field_global_roles_description',
             default=u"Should users that have this \
 role as a role in the whole site also receive this email?"),
         required=False)
     message = schema.Text(
         title=_plone(u"Message"),
-        description=_(u'field_message_description', 
+        description=_(u'field_message_description',
             default=u"Type in here the message that you \
 want to mail. Some defined content can be replaced: ${title} will be replaced \
 by the title of the newly created item. ${url} will be replaced by the \
@@ -149,7 +149,7 @@ action or enter an email in the portal properties")
         group_recipients = []
         new_recipients = []
         group_tool = portal.portal_groups
-        
+
         def _getGroupMemberIds(group):
             """ Helper method to support groups in groups. """
             members = []
@@ -164,10 +164,10 @@ action or enter an email in the portal properties")
         for recipient in recipients:
             group = group_tool.getGroupById(recipient)
             if group is not None:
-                group_recipients.append(recipient)                
+                group_recipients.append(recipient)
                 [new_recipients.append(user_id)
                  for user_id in _getGroupMemberIds(group)]
-        
+
         for recipient in group_recipients:
             recipients.remove(recipient)
 
@@ -205,7 +205,7 @@ class MailRoleAddForm(AddForm):
     """
     form_fields = form.FormFields(IMailRoleAction)
     label = _plone(u"Add Mail Action")
-    description = _(u'form_description', 
+    description = _(u'form_description',
         default=u"A mail action that can mail plone users who have "
                 u"a role on the object")
     form_name = _plone(u"Configure element")
