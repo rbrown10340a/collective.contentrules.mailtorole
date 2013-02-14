@@ -190,6 +190,8 @@ action or enter an email in the portal properties")
             if recipient_prop != None and len(recipient_prop) > 0:
                 recipients_mail.add(recipient_prop)
 
+        # Prepend interpolated message with \n to avoid interpretation
+        # of first line as header.
         message = "\n%s" % interpolator(self.element.message)
         subject = interpolator(self.element.subject)
 

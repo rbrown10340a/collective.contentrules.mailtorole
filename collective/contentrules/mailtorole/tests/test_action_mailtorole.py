@@ -165,7 +165,7 @@ class TestMailAction(ContentRulesTestCase):
 
         self.assertEqual("getme@frommember.com", mailSent.get('To'))
         self.assertEqual("foo@bar.be", mailSent.get('From'))
-        self.assertEqual("P\xc3\xa4ge 'W\xc3\xa4lkommen' created in \
+        self.assertEqual("\nP\xc3\xa4ge 'W\xc3\xa4lkommen' created in \
 http://nohost/plone/Members/test_user_1_/d1 !",
                          mailSent.get_payload(decode=True))
 
@@ -300,7 +300,7 @@ http://nohost/plone/Members/test_user_1_/d1 !",
             self.failUnless(mailSent.get('To') in ("getme@frommember.com",
                                                    "portal@owner.com"))
             self.assertEqual("foo@bar.be", mailSent.get('From'))
-            self.assertEqual("P\xc3\xa4ge 'W\xc3\xa4lkommen' created in http://nohost/plone/Members/test_user_1_/d1 !",
+            self.assertEqual("\nP\xc3\xa4ge 'W\xc3\xa4lkommen' created in http://nohost/plone/Members/test_user_1_/d1 !",
                              mailSent.get_payload(decode=True))
 
     def testExecuteNoSource(self):
@@ -327,7 +327,7 @@ http://nohost/plone/Members/test_user_1_/d1 !",
         assert("<manager@portal.be>" in mailSent.get('From'))
         assert("ploneRulez" in mailSent.get('From'))
 
-        self.assertEqual("Document created !",
+        self.assertEqual("\nDocument created !",
                          mailSent.get_payload(decode=True))
 
 
