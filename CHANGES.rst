@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.6 (unreleased)
+1.6 (2013-02-14)
 ----------------
 
 - Updated message and title to stringinterpolation, like in plone.app.contentrules
