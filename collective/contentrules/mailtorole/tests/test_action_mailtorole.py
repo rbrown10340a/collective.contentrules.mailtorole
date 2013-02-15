@@ -23,6 +23,7 @@ from Products.Five import fiveconfigure
 
 from Products.CMFCore.utils import getToolByName
 
+
 @onsetup
 def setup_product():
     """Set up the package and its dependencies.
@@ -317,7 +318,8 @@ http://nohost/plone/Members/test_user_1_/d1 !",
                              IExecutable)
         self.assertRaises(ValueError, ex)
         # if we provide a site mail address this won't fail anymore
-        sm.manage_changeProperties({'email_from_address': 'manager@portal.be', 'email_from_name':'ploneRulez'})
+        sm.manage_changeProperties({'email_from_address': 'manager@portal.be',
+                                    'email_from_name': 'ploneRulez'})
         ex()
         self.failUnless(isinstance(dummyMailHost.sent[0], MIMEText))
         mailSent = dummyMailHost.sent[0]

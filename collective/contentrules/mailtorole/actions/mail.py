@@ -11,7 +11,6 @@ from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
 from plone.stringinterp.interfaces import IStringInterpolator
 
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import safe_unicode
 
 # import the default messagefactory as _plone. These strings will not be put in
 # the locales .po file by i18ndude
@@ -80,6 +79,7 @@ class MailRoleAction(SimpleItem):
                   u"the object"),
                  mapping=dict(role=self.role))
 
+
 class MailActionExecutor(object):
     """The executor for this action.
     """
@@ -118,9 +118,6 @@ action or enter an email in the portal properties")
 
         interpolator = IStringInterpolator(obj)
 
-        event_title = safe_unicode(obj.Title())
-        event_url = obj.absolute_url()
-
         # search through all local roles on the object, and add
         # users's email to the recipients list if they have the local
         # role stored in the action
@@ -145,8 +142,8 @@ action or enter an email in the portal properties")
         if self.element.global_roles:
             pas = getToolByName(self.event.object, 'acl_users')
             rolemanager = pas.portal_role_manager
-            global_role_ids = [ p[0] for p in \
-                rolemanager.listAssignedPrincipals(self.element.role) ]
+            global_role_ids = [p[0] for p in
+                rolemanager.listAssignedPrincipals(self.element.role)]
             recipients.update(global_role_ids)
 
         # check to see if the recipents are users or groups
@@ -187,7 +184,7 @@ action or enter an email in the portal properties")
             if not member:
                 continue
             recipient_prop = member.getProperty('email')
-            if recipient_prop != None and len(recipient_prop) > 0:
+            if recipient_prop is not None and len(recipient_prop) > 0:
                 recipients_mail.add(recipient_prop)
 
         # Prepend interpolated message with \n to avoid interpretation
