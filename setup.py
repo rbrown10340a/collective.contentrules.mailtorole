@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='collective.contentrules.mailtorole',
-      version='1.7.dev0',
+      version='1.7',
       description="Send e-mail to users having a role on the object",
       long_description=(open("README.txt").read() + "\n" +
                         open("CHANGES.rst").read()),

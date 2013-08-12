@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.7 (unreleased)
+1.7 (2013-08-12)
 ----------------
 
 - add borg_local roles
