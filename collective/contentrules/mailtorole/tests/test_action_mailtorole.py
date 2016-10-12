@@ -43,7 +43,6 @@ class TestMailAction(ContentRulesTestCase):
 
     def afterSetUp(self):
         self.setRoles(('Manager',))
-        self.portal.invokeFactory('Folder', 'target')
         self.portal.invokeFactory('Folder', 'folder')
         self.folder = self.portal.folder
         self.portal.invokeFactory('Document', 'd1',
