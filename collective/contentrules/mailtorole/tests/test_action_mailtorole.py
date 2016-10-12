@@ -106,11 +106,11 @@ class TestMailAction(ContentRulesTestCase):
         addview = getMultiAdapter((adding, self.portal.REQUEST),
                                   name=element.addview)
         self.failUnless(isinstance(addview, MailRoleAddFormView))
-        addview.form.createAndAdd(data={'subject': 'My Subject',
-                                        'source': 'foo@bar.be',
-                                        'role': 'Owner',
-                                        'acquired': True,
-                                        'message': 'Hey, Oh!'})
+        addview.form_instance.createAndAdd(data={'subject': 'My Subject',
+                                                 'source': 'foo@bar.be',
+                                                 'role': 'Owner',
+                                                 'acquired': True,
+                                                 'message': 'Hey, Oh!'})
 
         e = rule.actions[0]
         self.failUnless(isinstance(e, MailRoleAction))
