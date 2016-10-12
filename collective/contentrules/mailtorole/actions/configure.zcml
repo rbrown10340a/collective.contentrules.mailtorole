@@ -23,15 +23,15 @@
      <browser:page
        for="plone.app.contentrules.browser.interfaces.IRuleActionAdding"
        name="plone.actions.MailRole"
-       class=".mail.MailRoleAddForm"
-       permission="cmf.ManagePortal"
+       class=".mail.MailRoleAddFormView"
+       permission="plone.app.contentrules.ManageContentRules"
        />
 
      <browser:page
        for="collective.contentrules.mailtorole.actions.mail.IMailRoleAction"
        name="edit"
-       class=".mail.MailRoleEditForm"
-       permission="cmf.ManagePortal"
+       class=".mail.MailRoleEditFormView"
+       permission="plone.app.contentrules.ManageContentRules"
        />
 
      <plone:ruleAction

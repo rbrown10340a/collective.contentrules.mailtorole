@@ -1,10 +1,11 @@
 Changes
 =======
 
-1.8 (unreleased)
+2.0 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Plone 5 compatibility
+  [keul]
 
 
 1.7 (2013-08-12)

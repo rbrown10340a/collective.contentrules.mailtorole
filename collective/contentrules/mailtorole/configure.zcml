@@ -6,6 +6,7 @@
     i18n_domain="collective.contentrules.mailtorole">
 
   <five:registerPackage package="." />
+  <includeDependencies package="." />
   <i18n:registerTranslations directory="locales" />
 
   <include package=".actions"/>
