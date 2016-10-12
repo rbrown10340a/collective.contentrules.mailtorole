@@ -25,11 +25,14 @@ setup(name='collective.contentrules.mailtorole',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'Products.CMFPlone',
           'plone.app.contentrules',
       ],
       extras_require={
           'test': [
+            'plone.api',
             'plone.app.testing',
+            'plone.app.contenttypes',
             'Products.SecureMailHost',
           ],
       },

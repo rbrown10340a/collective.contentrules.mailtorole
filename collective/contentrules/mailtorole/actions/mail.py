@@ -4,13 +4,16 @@ from Acquisition import aq_inner
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone import PloneMessageFactory as _plone
+from Products.MailHost.interfaces import IMailHost
 from collective.contentrules.mailtorole import mailtoroleMessageFactory as _
+from plone import api
 from plone.app.contentrules.actions import ActionAddForm, ActionEditForm
 from plone.app.contentrules.browser.formhelper import ContentRuleFormWrapper
 from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
 from plone.stringinterp.interfaces import IStringInterpolator
 from zope import schema
 from zope.component import adapts
+from zope.component import getUtility
 from zope.component.interfaces import ComponentLookupError
 from zope.formlib import form
 from zope.interface import Interface, implements
@@ -90,7 +93,8 @@ class MailActionExecutor(object):
         self.event = event
 
     def __call__(self):
-        mailhost = getToolByName(aq_inner(self.context), "MailHost")
+        # mailhost = getToolByName(aq_inner(self.context), "MailHost")
+        mailhost = getUtility(IMailHost)
 
         if not mailhost:
             raise ComponentLookupError(
@@ -104,11 +108,13 @@ class MailActionExecutor(object):
         if not source:
             # no source provided, looking for the site wide from email
             # address
-            from_address = portal.getProperty('email_from_address')
+            from_address = portal.getProperty('email_from_address') or\
+                api.portal.get_registry_record('plone.email_from_address')
             if not from_address:
                 raise ValueError("You must provide a source address for this \
 action or enter an email in the portal properties")
-            from_name = portal.getProperty('email_from_name').strip('"')
+            from_name = portal.getProperty('email_from_name', '').strip('"') or\
+                api.portal.get_registry_record('plone.email_from_name')
             source = '"%s" <%s>' % (from_name, from_address)
 
         obj = self.event.object
@@ -195,7 +201,10 @@ action or enter an email in the portal properties")
         subject = interpolator(self.element.subject)
 
         for recipient in recipients_mail:
-            mailhost.send(message, recipient, source, subject=subject)
+            mailhost.secureSend(
+                message, recipient, source, subject=subject,
+                charset='utf-8'
+            )
         return True
 
 
