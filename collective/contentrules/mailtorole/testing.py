@@ -4,14 +4,10 @@ from zope.configuration import xmlconfig
 
 from plone.testing import z2
 from Products.Five import fiveconfigure
-from Products.Five import zcml
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import FunctionalTesting
 from plone.app.testing import applyProfile
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
 
 
 class TestMailToRoleLayer(PloneSandboxLayer):
@@ -21,8 +17,6 @@ class TestMailToRoleLayer(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         fiveconfigure.debug_mode = True
         import collective.contentrules.mailtorole
-        #zcml.load_config('configure.zcml', collective.contentrules.mailtorole)
-        #fiveconfigure.debug_mode = False
         xmlconfig.file('configure.zcml',
                        collective.contentrules.mailtorole,
                        context=configurationContext)

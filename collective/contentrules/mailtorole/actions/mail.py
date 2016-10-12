@@ -15,7 +15,6 @@ from zope import schema
 from zope.component import adapts
 from zope.component import getUtility
 from zope.component.interfaces import ComponentLookupError
-from zope.formlib import form
 from zope.interface import Interface, implements
 
 

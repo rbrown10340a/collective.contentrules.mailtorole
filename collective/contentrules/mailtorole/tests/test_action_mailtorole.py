@@ -15,8 +15,6 @@ from Products.MailHost.interfaces import IMailHost
 from Products.SecureMailHost.SecureMailHost import SecureMailHost
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import SITE_OWNER_NAME
-from Products.Five import zcml
-from Products.Five import fiveconfigure
 from Products.CMFCore.utils import getToolByName
 from ..testing import MAILTOROLE_INTEGRATION_TESTING
 
@@ -45,7 +43,6 @@ class TestMailAction(ContentRulesTestCase):
 
     def afterSetUp(self):
         self.setRoles(('Manager',))
-        portal = self.layer['portal']
         self.portal.invokeFactory('Folder', 'target')
         self.portal.invokeFactory('Folder', 'folder')
         self.folder = self.portal.folder
