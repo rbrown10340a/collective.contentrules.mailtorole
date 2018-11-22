@@ -5,7 +5,7 @@ Changes
 ----------------
 
 - Plone 5 compatibility
-  [keul]
+  [keul, instification]
 
 
 1.7 (2013-08-12)

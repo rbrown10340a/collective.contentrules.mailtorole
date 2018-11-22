@@ -46,6 +46,11 @@ The checkboxes "Acquire roles" and "Global roles" are worth noting:
 - Checking "Global roles" will also send mail to users that have the specified
   role globally, that is in the entire site.
 
+Compatibility
+=============
+
+Tested with Plone 4.3, 5.0 and 5.1.
+
 Credits
 =======
 
