@@ -7,7 +7,6 @@
 .mr.developer.cfg
 bin
 build
-buildout.cfg
 develop-eggs
 dist
 downloads
@@ -15,3 +14,5 @@ eggs
 fake-eggs
 parts
 var
+lib
+include
