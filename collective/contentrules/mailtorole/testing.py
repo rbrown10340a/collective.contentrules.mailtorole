@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from zope.configuration import xmlconfig
-
+from plone import api
 from plone.testing import z2
 from Products.Five import fiveconfigure
 from plone.app.testing import PLONE_FIXTURE
@@ -9,6 +9,7 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import applyProfile
 
+IS_PLONE_5 = api.env.plone_version().startswith('5')
 
 class TestMailToRoleLayer(PloneSandboxLayer):
 
@@ -23,7 +24,8 @@ class TestMailToRoleLayer(PloneSandboxLayer):
         z2.installProduct(app, 'collective.contentrules.mailtorole')
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.app.contenttypes:default')
+        if IS_PLONE_5:
+            applyProfile(portal, 'plone.app.contenttypes:default')
         portal.portal_workflow.setDefaultChain("simple_publication_workflow")
         # quickInstallProduct(portal, 'rt.lastmodifier')
         # setRoles(portal, TEST_USER_ID, ['Member', 'Manager'])

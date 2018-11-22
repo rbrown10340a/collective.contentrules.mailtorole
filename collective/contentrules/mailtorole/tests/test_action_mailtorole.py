@@ -7,17 +7,33 @@ from zope.component.interfaces import IObjectEvent
 from zope.interface import implements
 from plone.app.contentrules.rule import Rule
 from plone.app.contentrules.tests.base import ContentRulesTestCase
-from collective.contentrules.mailtorole.actions.mail import (
-    MailRoleAction, MailRoleEditFormView, MailRoleAddFormView)
+from collective.contentrules.mailtorole.actions.mail import MailRoleAction
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleEditFormView
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleAddFormView
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleEditForm
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleAddForm
 from plone.contentrules.engine.interfaces import IRuleStorage
 from plone.contentrules.rule.interfaces import IRuleAction, IExecutable
 from Products.MailHost.interfaces import IMailHost
 from Products.SecureMailHost.SecureMailHost import SecureMailHost
-from plone.app.testing import TEST_USER_ID
 from plone.app.testing import SITE_OWNER_NAME
 from Products.CMFCore.utils import getToolByName
-from ..testing import MAILTOROLE_INTEGRATION_TESTING
+from collective.contentrules.mailtorole.testing import \
+    MAILTOROLE_INTEGRATION_TESTING
+from collective.contentrules.mailtorole.testing import IS_PLONE_5
 
+if not IS_PLONE_5:
+
+    from Products.PloneTestCase.layer import onsetup
+
+if IS_PLONE_5:
+    from plone.app.testing import TEST_USER_ID
+else:
+    from Products.PloneTestCase.setup import default_user as TEST_USER_ID
 
 class DummyEvent(object):
     implements(IObjectEvent)
@@ -101,19 +117,23 @@ class TestMailAction(ContentRulesTestCase):
         adding = getMultiAdapter((rule, self.portal.REQUEST), name='+action')
         addview = getMultiAdapter((adding, self.portal.REQUEST),
                                   name=element.addview)
-        self.assertTrue(isinstance(addview, MailRoleAddFormView))
+        if IS_PLONE_5:
+            self.assertTrue(isinstance(addview, MailRoleAddFormView))
+        else:
+            self.assertTrue(isinstance(addview, MailRoleAddForm))
 
-        addview.form_instance.update()
+        data = {'subject': 'My Subject',
+                'source': 'foo@bar.be',
+                'role': 'Owner',
+                'acquired': True,
+                'message': 'Hey, Oh!'
+                }
+        adder = addview
+        if IS_PLONE_5:
+            addview.form_instance.update()
+            adder = addview.form_instance
+        adder.createAndAdd(data=data)
 
-        content=addview.form_instance.create(
-            data={'subject': 'My Subject',
-                  'source': 'foo@bar.be',
-                  'role': 'Owner',
-                  'acquired': True,
-                  'message': 'Hey, Oh!'
-            }
-        )
-        addview.form_instance.add(content)
         e = rule.actions[0]
         self.assertTrue(isinstance(e, MailRoleAction))
         self.assertEquals('My Subject', e.subject)
@@ -127,10 +147,13 @@ class TestMailAction(ContentRulesTestCase):
         e = MailRoleAction()
         editview = getMultiAdapter((e, self.folder.REQUEST),
                                    name=element.editview)
-        self.failUnless(isinstance(editview, MailRoleEditFormView))
+        if IS_PLONE_5:
+            self.failUnless(isinstance(editview, MailRoleEditFormView))
+        else:
+            self.failUnless(isinstance(editview, MailRoleEditForm))
 
     def testExecute(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -155,7 +178,7 @@ http://nohost/plone/d1 !",
                          mailSent.get_payload(decode=True))
 
     def testExecuteWithGroup(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -175,7 +198,9 @@ http://nohost/plone/d1 !",
         assert("anotherdude@url.com" in mailSentTo)
 
     def testExecuteWithSubGroup(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
+        if IS_PLONE_5:
+            self.loginAsPortalOwner()
         membership = getToolByName(self.portal, 'portal_membership')
         groups = getToolByName(self.portal, 'portal_groups')
 
@@ -245,7 +270,7 @@ http://nohost/plone/d1 !",
         assert("submember3@url.com" in mailSentTo)
 
     def testExecuteNoEmptyMail(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -261,7 +286,7 @@ http://nohost/plone/d1 !",
         self.assertEqual(len(dummyMailHost.sent), 0)
 
     def testExecuteAcquired(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -289,7 +314,9 @@ http://nohost/plone/d1 !",
                              mailSent.get_payload(decode=True))
 
     def testExecuteNoSource(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
+        if IS_PLONE_5:
+            self.loginAsPortalOwner()
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -301,14 +328,19 @@ http://nohost/plone/d1 !",
         ex = getMultiAdapter((self.folder, e, DummyEvent(self.folder.d1)),
                              IExecutable)
         self.assertRaises(ValueError, ex)
-        api.portal.set_registry_record(
-            'plone.email_from_address',
-            'manager@portal.be'
-        )
-        api.portal.set_registry_record(
-            'plone.email_from_name',
-            u'ploneRulez'
-        )
+        if IS_PLONE_5:
+            api.portal.set_registry_record(
+                'plone.email_from_address',
+                'manager@portal.be'
+            )
+            api.portal.set_registry_record(
+                'plone.email_from_name',
+                u'ploneRulez'
+            )
+        else:
+            portal = api.portal.get()
+            portal.email_from_name = u'ploneRulez'
+            portal.email_from_address = 'manager@portal.be'
         ex()
         self.failUnless(isinstance(dummyMailHost.sent[0], MIMEText))
         mailSent = dummyMailHost.sent[0]

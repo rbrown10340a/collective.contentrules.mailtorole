@@ -27,6 +27,7 @@ setup(name='collective.contentrules.mailtorole',
           'setuptools',
           'Products.CMFPlone',
           'plone.app.contentrules',
+          'plone.api'
       ],
       extras_require={
           'test': [
@@ -34,6 +35,7 @@ setup(name='collective.contentrules.mailtorole',
             'plone.app.testing',
             'plone.app.contenttypes',
             'Products.SecureMailHost',
+            'Products.PloneTestCase == 0.9.18'
           ],
       },
       entry_points="""

@@ -7,8 +7,6 @@ from Products.CMFPlone import PloneMessageFactory as _plone
 from Products.MailHost.interfaces import IMailHost
 from collective.contentrules.mailtorole import mailtoroleMessageFactory as _
 from plone import api
-from plone.app.contentrules.actions import ActionAddForm, ActionEditForm
-from plone.app.contentrules.browser.formhelper import ContentRuleFormWrapper
 from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
 from plone.stringinterp.interfaces import IStringInterpolator
 from zope import schema
@@ -16,6 +14,18 @@ from zope.component import adapts
 from zope.component import getUtility
 from zope.component.interfaces import ComponentLookupError
 from zope.interface import Interface, implements
+
+IS_PLONE_5 = api.env.plone_version().startswith('5')
+if IS_PLONE_5:
+    from plone.app.contentrules.actions import ActionAddForm as AddForm
+    from plone.app.contentrules.actions import ActionAddForm as EditForm
+    from plone.app.contentrules.browser.formhelper import \
+        ContentRuleFormWrapper as FormWrapper
+else:
+    from zope.formlib import form
+    from plone.app.contentrules.browser.formhelper import AddForm, EditForm
+    from plone.z3cform.layout import FormWrapper
+    from plone.app.contentrules.browser.formhelper import _template
 
 
 class IMailRoleAction(Interface):
@@ -107,13 +117,18 @@ class MailActionExecutor(object):
         if not source:
             # no source provided, looking for the site wide from email
             # address
-            from_address = portal.getProperty('email_from_address') or\
-                api.portal.get_registry_record('plone.email_from_address')
+            from_address = portal.getProperty('email_from_address')
+            if IS_PLONE_5:
+                from_address = api.portal.get_registry_record(
+                    'plone.email_from_address')
             if not from_address:
                 raise ValueError("You must provide a source address for this \
 action or enter an email in the portal properties")
-            from_name = portal.getProperty('email_from_name', '').strip('"') or\
-                api.portal.get_registry_record('plone.email_from_name')
+
+            from_name = portal.getProperty('email_from_name', '').strip('"')
+            if IS_PLONE_5:
+                from_name = api.portal.get_registry_record(
+                    'plone.email_from_name')
             source = '"%s" <%s>' % (from_name, from_address)
 
         obj = self.event.object
@@ -207,7 +222,7 @@ action or enter an email in the portal properties")
         return True
 
 
-class MailRoleAddForm(ActionAddForm):
+class MailRoleAddForm(AddForm):
     """
     An add form for the mail action
     """
@@ -218,13 +233,22 @@ class MailRoleAddForm(ActionAddForm):
                     u"a role on the object")
     form_name = _plone(u"Configure element")
     Type = MailRoleAction
+    if not IS_PLONE_5:
+        form_fields = form.FormFields(IMailRoleAction)
+
+    def create(self, data):
+        if IS_PLONE_5:
+            return super(MailRoleAddForm, self).create(data)
+        a = MailRoleAction()
+        form.applyChanges(a, self.form_fields, data)
+        return a
 
 
-class MailRoleAddFormView(ContentRuleFormWrapper):
+class MailRoleAddFormView(FormWrapper):
     form = MailRoleAddForm
 
 
-class MailRoleEditForm(ActionEditForm):
+class MailRoleEditForm(EditForm):
     """
     An edit form for the mail action
     """
@@ -233,7 +257,10 @@ class MailRoleEditForm(ActionEditForm):
     description = _plone(u"A mail action that can mail plone users who have "
                          u"a role on the object")
     form_name = _plone(u"Configure element")
+    if not IS_PLONE_5:
+        form_fields = form.FormFields(IMailRoleAction)
 
 
-class MailRoleEditFormView(ContentRuleFormWrapper):
+class MailRoleEditFormView(FormWrapper):
     form = MailRoleEditForm
+
