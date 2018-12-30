@@ -4,6 +4,10 @@ Changes
 2.0 (unreleased)
 ----------------
 
+- List all portal roles, not just sharing tab roles.
+  Fixes `issue 2 <https://github.com/collective/collective.contentrules.mailtorole/issues/2>`_.
+  [afrepues, instification]
+
 - Plone 5 compatibility
   [keul, instification]
 
