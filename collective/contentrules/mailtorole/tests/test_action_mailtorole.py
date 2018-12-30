@@ -1,47 +1,39 @@
 # -*- coding: utf-8 -*-
 
+from plone import api
 from email.MIMEText import MIMEText
-
 from zope.component import getUtility, getMultiAdapter, getSiteManager
 from zope.component.interfaces import IObjectEvent
 from zope.interface import implements
-
 from plone.app.contentrules.rule import Rule
 from plone.app.contentrules.tests.base import ContentRulesTestCase
-from collective.contentrules.mailtorole.actions.mail import (
-    MailRoleAction, MailRoleEditForm, MailRoleAddForm)
+from collective.contentrules.mailtorole.actions.mail import MailRoleAction
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleEditFormView
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleAddFormView
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleEditForm
+from collective.contentrules.mailtorole.actions.mail import \
+    MailRoleAddForm
 from plone.contentrules.engine.interfaces import IRuleStorage
 from plone.contentrules.rule.interfaces import IRuleAction, IExecutable
-
 from Products.MailHost.interfaces import IMailHost
 from Products.SecureMailHost.SecureMailHost import SecureMailHost
-
-from Products.PloneTestCase.setup import default_user
-from Products.PloneTestCase.layer import onsetup
-from Products.Five import zcml
-from Products.Five import fiveconfigure
-
+from plone.app.testing import SITE_OWNER_NAME
 from Products.CMFCore.utils import getToolByName
+from collective.contentrules.mailtorole.testing import \
+    MAILTOROLE_INTEGRATION_TESTING
+from collective.contentrules.mailtorole.testing import IS_PLONE_5
 
+if not IS_PLONE_5:
 
-@onsetup
-def setup_product():
-    """Set up the package and its dependencies.
+    from Products.PloneTestCase.layer import onsetup
 
-    The @onsetup decorator causes the execution of this body to be deferred
-    until the setup of the Plone site testing layer. We could have created our
-    own layer, but this is the easiest way for Plone integration tests.
-    """
-
-    fiveconfigure.debug_mode = True
-    import collective.contentrules.mailtorole
-    zcml.load_config('configure.zcml', collective.contentrules.mailtorole)
-    fiveconfigure.debug_mode = False
-
-setup_product()
-
-# basic test structure copied from plone.app.contentrules test_action_mail.py
-
+if IS_PLONE_5:
+    from plone.app.testing import TEST_USER_ID
+else:
+    from Products.PloneTestCase.setup import default_user as TEST_USER_ID
 
 class DummyEvent(object):
     implements(IObjectEvent)
@@ -57,21 +49,24 @@ class DummySecureMailHost(SecureMailHost):
         self.id = id
         self.sent = []
 
-    def _send(self, mfrom, mto, messageText, debug=False):
+    def _send(self, mfrom, mto, messageText, debug=False, charset=''):
         self.sent.append(messageText)
 
 
 class TestMailAction(ContentRulesTestCase):
 
+    layer = MAILTOROLE_INTEGRATION_TESTING
+
     def afterSetUp(self):
         self.setRoles(('Manager',))
-        self.portal.invokeFactory('Folder', 'target')
-        self.folder.invokeFactory('Document', 'd1',
+        self.portal.invokeFactory('Folder', 'folder')
+        self.folder = self.portal.folder
+        self.portal.invokeFactory('Document', 'd1',
             title=unicode('Wälkommen', 'utf-8'))
         # set the email address of the default_user.
-        member = self.portal.portal_membership.getMemberById(default_user)
+        member = self.portal.portal_membership.getMemberById(TEST_USER_ID)
         member.setMemberProperties(dict(email="getme@frommember.com"))
-        member = self.portal.portal_membership.getMemberById('portal_owner')
+        member = self.portal.portal_membership.getMemberById(SITE_OWNER_NAME)
         member.setMemberProperties(dict(email="portal@owner.com"))
 
         # set up a group
@@ -122,16 +117,25 @@ class TestMailAction(ContentRulesTestCase):
         adding = getMultiAdapter((rule, self.portal.REQUEST), name='+action')
         addview = getMultiAdapter((adding, self.portal.REQUEST),
                                   name=element.addview)
-        self.failUnless(isinstance(addview, MailRoleAddForm))
+        if IS_PLONE_5:
+            self.assertTrue(isinstance(addview, MailRoleAddFormView))
+        else:
+            self.assertTrue(isinstance(addview, MailRoleAddForm))
 
-        addview.createAndAdd(data={'subject': 'My Subject',
-                                   'source': 'foo@bar.be',
-                                   'role': 'Owner',
-                                   'acquired': True,
-                                   'message': 'Hey, Oh!'})
+        data = {'subject': 'My Subject',
+                'source': 'foo@bar.be',
+                'role': 'Owner',
+                'acquired': True,
+                'message': 'Hey, Oh!'
+                }
+        adder = addview
+        if IS_PLONE_5:
+            addview.form_instance.update()
+            adder = addview.form_instance
+        adder.createAndAdd(data=data)
 
         e = rule.actions[0]
-        self.failUnless(isinstance(e, MailRoleAction))
+        self.assertTrue(isinstance(e, MailRoleAction))
         self.assertEquals('My Subject', e.subject)
         self.assertEquals('foo@bar.be', e.source)
         self.assertEquals('Owner', e.role)
@@ -143,10 +147,13 @@ class TestMailAction(ContentRulesTestCase):
         e = MailRoleAction()
         editview = getMultiAdapter((e, self.folder.REQUEST),
                                    name=element.editview)
-        self.failUnless(isinstance(editview, MailRoleEditForm))
+        if IS_PLONE_5:
+            self.failUnless(isinstance(editview, MailRoleEditFormView))
+        else:
+            self.failUnless(isinstance(editview, MailRoleEditForm))
 
     def testExecute(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -167,11 +174,11 @@ class TestMailAction(ContentRulesTestCase):
         self.assertEqual("getme@frommember.com", mailSent.get('To'))
         self.assertEqual("foo@bar.be", mailSent.get('From'))
         self.assertEqual("\nP\xc3\xa4ge 'W\xc3\xa4lkommen' created in \
-http://nohost/plone/Members/test_user_1_/d1 !",
+http://nohost/plone/d1 !",
                          mailSent.get_payload(decode=True))
 
     def testExecuteWithGroup(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -191,7 +198,9 @@ http://nohost/plone/Members/test_user_1_/d1 !",
         assert("anotherdude@url.com" in mailSentTo)
 
     def testExecuteWithSubGroup(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
+        if IS_PLONE_5:
+            self.loginAsPortalOwner()
         membership = getToolByName(self.portal, 'portal_membership')
         groups = getToolByName(self.portal, 'portal_groups')
 
@@ -261,7 +270,7 @@ http://nohost/plone/Members/test_user_1_/d1 !",
         assert("submember3@url.com" in mailSentTo)
 
     def testExecuteNoEmptyMail(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -277,7 +286,7 @@ http://nohost/plone/Members/test_user_1_/d1 !",
         self.assertEqual(len(dummyMailHost.sent), 0)
 
     def testExecuteAcquired(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -301,11 +310,13 @@ http://nohost/plone/Members/test_user_1_/d1 !",
             self.failUnless(mailSent.get('To') in ("getme@frommember.com",
                                                    "portal@owner.com"))
             self.assertEqual("foo@bar.be", mailSent.get('From'))
-            self.assertEqual("\nP\xc3\xa4ge 'W\xc3\xa4lkommen' created in http://nohost/plone/Members/test_user_1_/d1 !",
+            self.assertEqual("\nP\xc3\xa4ge 'W\xc3\xa4lkommen' created in http://nohost/plone/d1 !",
                              mailSent.get_payload(decode=True))
 
     def testExecuteNoSource(self):
-        self.loginAsPortalOwner()
+        self.setRoles('Manager')
+        if IS_PLONE_5:
+            self.loginAsPortalOwner()
         sm = getSiteManager(self.portal)
         sm.unregisterUtility(provided=IMailHost)
         dummyMailHost = DummySecureMailHost('dMailhost')
@@ -317,9 +328,19 @@ http://nohost/plone/Members/test_user_1_/d1 !",
         ex = getMultiAdapter((self.folder, e, DummyEvent(self.folder.d1)),
                              IExecutable)
         self.assertRaises(ValueError, ex)
-        # if we provide a site mail address this won't fail anymore
-        sm.manage_changeProperties({'email_from_address': 'manager@portal.be',
-                                    'email_from_name': 'ploneRulez'})
+        if IS_PLONE_5:
+            api.portal.set_registry_record(
+                'plone.email_from_address',
+                'manager@portal.be'
+            )
+            api.portal.set_registry_record(
+                'plone.email_from_name',
+                u'ploneRulez'
+            )
+        else:
+            portal = api.portal.get()
+            portal.email_from_name = u'ploneRulez'
+            portal.email_from_address = 'manager@portal.be'
         ex()
         self.failUnless(isinstance(dummyMailHost.sent[0], MIMEText))
         mailSent = dummyMailHost.sent[0]
