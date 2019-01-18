@@ -4,6 +4,7 @@ from Acquisition import aq_inner
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone import PloneMessageFactory as _plone
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.MailHost.interfaces import IMailHost
 from collective.contentrules.mailtorole import mailtoroleMessageFactory as _
 from plone import api
@@ -233,6 +234,8 @@ class MailRoleAddForm(AddForm):
                     u"a role on the object")
     form_name = _plone(u"Configure element")
     Type = MailRoleAction
+    template = ViewPageTemplateFile('templates/mail.pt')
+
     if not IS_PLONE_5:
         form_fields = form.FormFields(IMailRoleAction)
 
@@ -257,6 +260,7 @@ class MailRoleEditForm(EditForm):
     description = _plone(u"A mail action that can mail plone users who have "
                          u"a role on the object")
     form_name = _plone(u"Configure element")
+    template = ViewPageTemplateFile('templates/mail.pt')
     if not IS_PLONE_5:
         form_fields = form.FormFields(IMailRoleAction)
 
