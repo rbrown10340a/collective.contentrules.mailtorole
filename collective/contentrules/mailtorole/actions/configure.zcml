@@ -58,7 +58,7 @@
          title="Send email to role"
          description="Send an email on the triggering object"
          for="*"
-         event="zope.component.interfaces.IObjectEvent"
+         event="zope.interface.interfaces.IObjectEvent"
          addview="plone.actions.MailRole"
          editview="edit"
          schema=".mail.IMailRoleAction"

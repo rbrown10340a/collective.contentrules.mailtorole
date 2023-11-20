@@ -13,11 +13,17 @@ from plone.stringinterp.interfaces import IStringInterpolator
 from zope import schema
 from zope.component import adapts
 from zope.component import getUtility
-from zope.component.interfaces import ComponentLookupError
-from zope.interface import Interface, implements
+from zope.interface.interfaces import ComponentLookupError
+from zope.interface import Interface, implementer
 
+IS_PLONE_6 = api.env.plone_version().startswith('6')
 IS_PLONE_5 = api.env.plone_version().startswith('5')
-if IS_PLONE_5:
+if IS_PLONE_6:
+    from plone.app.contentrules.actions import ActionAddForm as AddForm
+    from plone.app.contentrules.actions import ActionAddForm as EditForm
+    from plone.app.contentrules.browser.formhelper import \
+        ContentRuleFormWrapper as FormWrapper
+elif IS_PLONE_5:
     from plone.app.contentrules.actions import ActionAddForm as AddForm
     from plone.app.contentrules.actions import ActionAddForm as EditForm
     from plone.app.contentrules.browser.formhelper import \
@@ -70,11 +76,11 @@ URL of the newly created item."),
         required=True)
 
 
+@implementer(IMailRoleAction, IRuleElementData)
 class MailRoleAction(SimpleItem):
     """
     The implementation of the action defined before
     """
-    implements(IMailRoleAction, IRuleElementData)
 
     subject = u''
     source = u''
@@ -91,10 +97,10 @@ class MailRoleAction(SimpleItem):
                  mapping=dict(role=self.role))
 
 
+@implementer(IExecutable)
 class MailActionExecutor(object):
     """The executor for this action.
     """
-    implements(IExecutable)
     adapts(Interface, IMailRoleAction, Interface)
 
     def __init__(self, context, element, event):
@@ -119,7 +125,7 @@ class MailActionExecutor(object):
             # no source provided, looking for the site wide from email
             # address
             from_address = portal.getProperty('email_from_address')
-            if IS_PLONE_5:
+            if (IS_PLONE_5, IS_PLONE_6):
                 from_address = api.portal.get_registry_record(
                     'plone.email_from_address')
             if not from_address:
@@ -127,7 +133,7 @@ class MailActionExecutor(object):
 action or enter an email in the portal properties")
 
             from_name = portal.getProperty('email_from_name', '').strip('"')
-            if IS_PLONE_5:
+            if (IS_PLONE_5, IS_PLONE_6):
                 from_name = api.portal.get_registry_record(
                     'plone.email_from_name')
             source = '"%s" <%s>' % (from_name, from_address)
@@ -231,16 +237,16 @@ class MailRoleAddForm(AddForm):
     label = _plone(u"Add Mail Action")
     description = _(u'form_description',
                     default=u"A mail action that can mail plone users who have "
-                    u"a role on the object")
+                            u"a role on the object")
     form_name = _plone(u"Configure element")
     Type = MailRoleAction
     template = ViewPageTemplateFile('templates/mail.pt')
 
-    if not IS_PLONE_5:
+    if not (IS_PLONE_5, IS_PLONE_6):
         form_fields = form.FormFields(IMailRoleAction)
 
     def create(self, data):
-        if IS_PLONE_5:
+        if (IS_PLONE_5, IS_PLONE_6):
             return super(MailRoleAddForm, self).create(data)
         a = MailRoleAction()
         form.applyChanges(a, self.form_fields, data)
@@ -261,10 +267,9 @@ class MailRoleEditForm(EditForm):
                          u"a role on the object")
     form_name = _plone(u"Configure element")
     template = ViewPageTemplateFile('templates/mail.pt')
-    if not IS_PLONE_5:
+    if not (IS_PLONE_5, IS_PLONE_6):
         form_fields = form.FormFields(IMailRoleAction)
 
 
 class MailRoleEditFormView(FormWrapper):
     form = MailRoleEditForm
-
