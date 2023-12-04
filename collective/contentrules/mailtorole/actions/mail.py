@@ -18,8 +18,8 @@ from zope.interface import Interface, implementer
 # from zope.interface.declarations import Implements as implements
 
 
-IS_PLONE_5 = api.env.plone_version().startswith('5') or api.env.plone_version().startswith('6')
-if IS_PLONE_5:
+IS_PLONE_6 = api.env.plone_version().startswith('6')
+if IS_PLONE_6:
     from plone.app.contentrules.actions import ActionAddForm as AddForm
     from plone.app.contentrules.actions import ActionAddForm as EditForm
     from plone.app.contentrules.browser.formhelper import \
@@ -125,7 +125,7 @@ class MailActionExecutor(object):
             # no source provided, looking for the site wide from email
             # address
             from_address = portal.getProperty('email_from_address')
-            if IS_PLONE_5:
+            if IS_PLONE_6:
                 from_address = api.portal.get_registry_record(
                     'plone.email_from_address')
             if not from_address:
@@ -133,7 +133,7 @@ class MailActionExecutor(object):
 action or enter an email in the portal properties")
 
             from_name = portal.getProperty('email_from_name', '').strip('"')
-            if IS_PLONE_5:
+            if IS_PLONE_6:
                 from_name = api.portal.get_registry_record(
                     'plone.email_from_name')
             source = '"%s" <%s>' % (from_name, from_address)
@@ -242,11 +242,11 @@ class MailRoleAddForm(AddForm):
     Type = MailRoleAction
     template = ViewPageTemplateFile('templates/mail.pt')
 
-    if not IS_PLONE_5:
+    if not IS_PLONE_6:
         form_fields = form.FormFields(IMailRoleAction)
 
     def create(self, data):
-        if IS_PLONE_5:
+        if IS_PLONE_6:
             return super(MailRoleAddForm, self).create(data)
         a = MailRoleAction()
         form.applyChanges(a, self.form_fields, data)
@@ -267,7 +267,7 @@ class MailRoleEditForm(EditForm):
                          u"a role on the object")
     form_name = _(u"Configure element")
     template = ViewPageTemplateFile('templates/mail.pt')
-    if not IS_PLONE_5:
+    if not IS_PLONE_6:
         form_fields = form.FormFields(IMailRoleAction)
 
 
