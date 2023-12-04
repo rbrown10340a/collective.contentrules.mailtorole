@@ -41,7 +41,7 @@
        zcml:condition="not-have plone-5"
        for="plone.app.contentrules.browser.interfaces.IRuleActionAdding"
        name="plone.actions.MailRole"
-       class=".mail.MailRoleAddForm"
+       class=".mail.MailRoleAddFormView"
        permission="plone.app.contentrules.ManageContentRules"
        />
 
@@ -49,7 +49,7 @@
        zcml:condition="not-have plone-5"
        for="collective.contentrules.mailtorole.actions.mail.IMailRoleAction"
        name="edit"
-       class=".mail.MailRoleEditForm"
+       class=".mail.MailRoleEditFormView"
        permission="plone.app.contentrules.ManageContentRules"
        />
 
