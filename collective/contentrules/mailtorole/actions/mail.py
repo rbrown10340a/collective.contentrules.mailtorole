@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
-from Acquisition import aq_inner
+from Products.MailHost.MailHost import message_from_string
+# from Acquisition import aq_inner
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone import PloneMessageFactory as _plone
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from Products.MailHost.interfaces import IMailHost
+# from Products.MailHost.interfaces import IMailHost
 from collective.contentrules.mailtorole import mailtoroleMessageFactory as _
 from plone import api
 from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
@@ -14,7 +14,8 @@ from zope import schema
 from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
-from zope.component import getUtility
+
+# from zope.component import getUtility
 
 # from zope.interface import Interface, implements
 
@@ -99,6 +100,7 @@ class MailRoleAction(SimpleItem):
 class MailActionExecutor(object):
     """The executor for this action.
     """
+
     # implements(IExecutable)
     # adapts(Interface, IMailRoleAction, Interface)
 
@@ -179,8 +181,8 @@ action or enter an email in the portal properties")
             members = []
             # for member_id in group.getGroupMemberIds():
             users = api.user.get_users()
-            for user in users:
-                member_id = user.id
+            for member_user in users:
+                member_id = member_user.id
                 subgroup = group_tool.getGroupById(member_id)
                 if subgroup is not None:
                     members.extend(_getGroupMemberIds(subgroup))
@@ -215,15 +217,14 @@ action or enter an email in the portal properties")
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
+        subject = interpolator(self.element.subject)
         message = "\n%s" % interpolator(self.element.message)
-        # subject = interpolator(self.element.subject)
-        subject = str(self.element.subject).encode('utf-8', 'ignore')
         for recipient in recipients_mail:
-            # mailhost.send(
-            #     message, recipient, source, subject=subject,
-            #     charset='utf-8'
-            # )
-            api.portal.send_email(subject=subject, body=message, recipient=recipient, sender=source, immediate=False)
+            mailhost.send(
+                message, recipient, source, subject=subject,
+                charset='utf-8', immediate=False, msg_type='text/plain'
+            )
+            # api.portal.send_email(recipient=recipient.split(','), sender=source, subject=subject, body=message, immediate=False)
         return True
 
 
