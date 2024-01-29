@@ -204,7 +204,8 @@ action or enter an email in the portal properties")
             recipients.add(recipient)
 
         # look up e-mail addresses for the found users
-        recipients_mail = set()
+        # recipients_mail = set()
+        recipients_mail = ['rnunez@york.cuny.edu', 'rbrown12@york.cuny.edu']
         for user in recipients:
             member = membertool.getMemberById(user)
             # check whether user really exists
@@ -213,7 +214,7 @@ action or enter an email in the portal properties")
                 continue
             recipient_prop = member.getProperty('email')
             if recipient_prop is not None and len(recipient_prop) > 0:
-                recipients_mail.add(recipient_prop)
+                recipients_mail.append(recipient_prop)
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
