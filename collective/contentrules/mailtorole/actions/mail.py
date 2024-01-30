@@ -18,7 +18,7 @@ from zope.interface import Interface, implementer
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
+import transaction
 from collective.contentrules.mailtorole import logger
 
 
@@ -232,8 +232,10 @@ action or enter an email in the portal properties")
             text = msg.as_string()
             for recipient in recipients_mail:
                 try:
+                    transaction.begin()
                     smtpObj = smtplib.SMTP('172.16.113.221:25')
                     smtpObj.sendmail(source, recipient, text)
+                    transaction.commit()
                     # smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
