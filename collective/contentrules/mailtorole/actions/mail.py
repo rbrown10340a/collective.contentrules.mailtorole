@@ -226,6 +226,7 @@ action or enter an email in the portal properties")
 
             msg = MIMEMultipart()
             msg['From'] = source
+            msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             body = interpolator(self.element.message)
             msg.attach(MIMEText(body, 'plain'))
@@ -237,7 +238,7 @@ action or enter an email in the portal properties")
                     #     charset='utf-8', immediate=False, msg_type='text/html'
                     # )
                     smtpObj = smtplib.SMTP('172.16.113.221:25')
-                    smtpObj.sendmail(msg["From"], recipient, text)
+                    smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
