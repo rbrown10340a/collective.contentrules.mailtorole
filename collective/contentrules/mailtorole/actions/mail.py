@@ -221,8 +221,8 @@ action or enter an email in the portal properties")
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
-            subject = interpolator(self.element.subject)
-            message = "\n%s" % interpolator(self.element.message)
+        #     subject = interpolator(self.element.subject)
+        #     message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
             msg['From'] = source
             msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu'
