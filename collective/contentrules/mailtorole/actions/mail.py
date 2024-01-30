@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Products.MailHost.MailHost import message_from_string
+# from Products.MailHost.MailHost import message_from_string
 # from Acquisition import aq_inner
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import getToolByName
@@ -14,6 +14,10 @@ from zope import schema
 from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from smtplib import SMTPException
 
 # from zope.component import getUtility
 
@@ -204,8 +208,7 @@ action or enter an email in the portal properties")
             recipients.add(recipient)
 
         # look up e-mail addresses for the found users
-        # recipients_mail = set()
-        recipients_mail = ['rnunez@york.cuny.edu', 'rbrown12@york.cuny.edu']
+        recipients_mail = set()
         for user in recipients:
             member = membertool.getMemberById(user)
             # check whether user really exists
@@ -214,19 +217,33 @@ action or enter an email in the portal properties")
                 continue
             recipient_prop = member.getProperty('email')
             if recipient_prop is not None and len(recipient_prop) > 0:
-                recipients_mail.append(recipient_prop)
+                recipients_mail.add(recipient_prop)
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
-        subject = interpolator(self.element.subject)
-        message = "\n%s" % interpolator(self.element.message)
-        for recipient in recipients_mail:
-            mailhost.send(
-                message, recipient, source, subject=subject,
-                charset='utf-8', immediate=False, msg_type='text/plain'
-            )
+        # subject = interpolator(self.element.subject)
+        # message = "\n%s" % interpolator(self.element.message)
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = source
+            msg['To'] = 'rnunez@york.cuny.edu,rbrown12@york.cuny.edu'
+            msg['Subject'] = interpolator(self.element.subject)
+            text = interpolator(self.element.message)
+            for recipient in recipients_mail:
+                if recipient:
+                    api.portal.send_email(recipient=recipient, sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
+                else:
+                    api.portal.send_email(recipient=msg['To'].split(','), sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
+            return True
+        except:
+            pass
+        # for recipient in recipients_mail:
+        #     mailhost.send(
+        #         message, recipient, source, subject=subject,
+        #         charset='utf-8', immediate=False, msg_type='text/plain'
+        #     )
             # api.portal.send_email(recipient=recipient.split(','), sender=source, subject=subject, body=message, immediate=False)
-        return True
+        # return True
 
 
 class MailRoleAddForm(AddForm):

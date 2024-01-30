@@ -28,7 +28,8 @@ setup(name='collective.contentrules.mailtorole',
           'Products.CMFPlone',
           'plone.app.contentrules',
           'plone.api',
-          'zope.formlib'
+          'zope.formlib',
+          'email'
       ],
       extras_require={
           'test': [
