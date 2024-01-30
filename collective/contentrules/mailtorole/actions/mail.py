@@ -221,9 +221,8 @@ action or enter an email in the portal properties")
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
-        # subject = interpolator(self.element.subject)
-        # message = "\n%s" % interpolator(self.element.message)
-
+            subject = interpolator(self.element.subject)
+            message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
             msg['From'] = source
             msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu'
@@ -233,12 +232,11 @@ action or enter an email in the portal properties")
             text = msg.as_string()
             for recipient in recipients_mail:
                 try:
-                    # mailhost.send(
-                    #     text, recipient, msg['From'], subject=msg['Subject'],
-                    #     charset='utf-8', immediate=False, msg_type='text/html'
-                    # )
-                    smtpObj = smtplib.SMTP('172.16.113.221:25')
-                    smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
+                    try:
+                        api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
+                    except:
+                        smtpObj = smtplib.SMTP('172.16.113.221:25')
+                        smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
