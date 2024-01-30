@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# from Products.MailHost.MailHost import message_from_string
+from Products.MailHost.MailHost import MailHostError
+from smtplib import SMTPException
 # from Acquisition import aq_inner
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import getToolByName
@@ -14,26 +15,24 @@ from zope import schema
 from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
-# import smtplib
+
 from email.mime.multipart import MIMEMultipart
-# from email.mime.text import MIMEText
-# from smtplib import SMTPException
 
-# from zope.component import getUtility
+from collective.contentrules.mailtorole import logger
 
-# from zope.interface import Interface, implements
 
-IS_PLONE_5 = api.env.plone_version().startswith('5')
-if IS_PLONE_5:
+try:
     from plone.app.contentrules.actions import ActionAddForm as AddForm
     from plone.app.contentrules.actions import ActionEditForm as EditForm
     from plone.app.contentrules.browser.formhelper import \
         ContentRuleFormWrapper as FormWrapper
-else:
+    IS_PLONE_5 = True
+except ImportError:
     from zope.formlib import form
     from plone.app.contentrules.browser.formhelper import AddForm, EditForm
-    from plone.app.contentrules.browser.formhelper import \
-        ContentRuleFormWrapper as FormWrapper
+    from plone.app.contentrules.browser.formhelper import _template
+    from plone.z3cform.layout import FormWrapper
+    IS_PLONE_5 = False
 
 
 class IMailRoleAction(Interface):
@@ -223,27 +222,29 @@ action or enter an email in the portal properties")
         # of first line as header.
         # subject = interpolator(self.element.subject)
         # message = "\n%s" % interpolator(self.element.message)
-        try:
+
             msg = MIMEMultipart()
             msg['From'] = source
             msg['To'] = 'rnunez@york.cuny.edu,rbrown12@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             text = interpolator(self.element.message)
             for recipient in recipients_mail:
-                if recipient:
-                    api.portal.send_email(recipient=recipient, sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
-                else:
-                    api.portal.send_email(recipient=msg['To'].split(','), sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
+                msg['To'] = 'rnunez@york.cuny.edu,rbrown12@york.cuny.edu' or recipient
+                try:
+                    mailhost.send(
+                        text, msg['To'].split(','), msg['From'], subject=msg['Subject'],
+                        charset='utf-8', immediate=False, msg_type='text/html'
+                    )
+                except (MailHostError, SMTPException):
+                    logger.exception(
+                        'mail error: Attempt to send mail in content rule failed'
+                    )
+                    mailhost.send(
+                        text, msg['To'].split(','), msg['From'], subject=msg['Subject'],
+                        charset='utf-8', immediate=False, msg_type='text/html'
+                    )
             return True
-        except:
-            pass
-        # for recipient in recipients_mail:
-        #     mailhost.send(
-        #         message, recipient, source, subject=subject,
-        #         charset='utf-8', immediate=False, msg_type='text/plain'
-        #     )
-            # api.portal.send_email(recipient=recipient.split(','), sender=source, subject=subject, body=message, immediate=False)
-        # return True
+
 
 
 class MailRoleAddForm(AddForm):
