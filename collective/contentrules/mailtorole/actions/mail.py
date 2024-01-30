@@ -16,7 +16,7 @@ from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
 import smtplib
-
+from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 from collective.contentrules.mailtorole import logger
@@ -227,14 +227,16 @@ action or enter an email in the portal properties")
             msg = MIMEMultipart()
             msg['From'] = source
             msg['Subject'] = interpolator(self.element.subject)
-            text = interpolator(self.element.message)
+            body = interpolator(self.element.message)
+            msg.attach(MIMEText(body, 'plain'))
+            text = msg.as_string()
             for recipient in recipients_mail:
                 try:
                     # mailhost.send(
                     #     text, recipient, msg['From'], subject=msg['Subject'],
                     #     charset='utf-8', immediate=False, msg_type='text/html'
                     # )
-                    smtpObj = smtplib.SMTP('172.16.113.223:25')
+                    smtpObj = smtplib.SMTP('172.16.113.221:25')
                     smtpObj.sendmail(msg["From"], recipient, text)
                 except (MailHostError, SMTPException):
                     logger.exception(
