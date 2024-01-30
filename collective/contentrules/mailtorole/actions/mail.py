@@ -225,23 +225,17 @@ action or enter an email in the portal properties")
 
             msg = MIMEMultipart()
             msg['From'] = source
-            msg['To'] = 'rnunez@york.cuny.edu,rbrown12@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             text = interpolator(self.element.message)
             for recipient in recipients_mail:
-                msg['To'] = 'rnunez@york.cuny.edu,rbrown12@york.cuny.edu' or recipient
                 try:
                     mailhost.send(
-                        text, msg['To'].split(','), msg['From'], subject=msg['Subject'],
+                        text, recipient, msg['From'], subject=msg['Subject'],
                         charset='utf-8', immediate=False, msg_type='text/html'
                     )
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
-                    )
-                    mailhost.send(
-                        text, msg['To'].split(','), msg['From'], subject=msg['Subject'],
-                        charset='utf-8', immediate=False, msg_type='text/html'
                     )
             return True
 
