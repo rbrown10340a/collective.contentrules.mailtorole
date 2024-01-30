@@ -14,10 +14,10 @@ from zope import schema
 from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
-import smtplib
+# import smtplib
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from smtplib import SMTPException
+# from email.mime.text import MIMEText
+# from smtplib import SMTPException
 
 # from zope.component import getUtility
 
