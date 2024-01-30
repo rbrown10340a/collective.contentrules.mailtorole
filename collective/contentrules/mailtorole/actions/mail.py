@@ -232,11 +232,11 @@ action or enter an email in the portal properties")
             text = msg.as_string()
             for recipient in recipients_mail:
                 try:
-                    try:
-                        api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
-                    except:
-                        smtpObj = smtplib.SMTP('172.16.113.221:25')
-                        smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
+                    # try:
+                    #     api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
+                    # except:
+                    smtpObj = smtplib.SMTP('172.16.113.221:25')
+                    smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
