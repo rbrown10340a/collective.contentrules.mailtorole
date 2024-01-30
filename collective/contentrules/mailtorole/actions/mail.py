@@ -225,18 +225,19 @@ action or enter an email in the portal properties")
         #     message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
             msg['From'] = source
-            msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu'
+            # msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu,kamarjit@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             body = interpolator(self.element.message)
             msg.attach(MIMEText(body, 'plain'))
             text = msg.as_string()
             for recipient in recipients_mail:
                 try:
-                    # try:
-                    #     api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
-                    # except:
-                    smtpObj = smtplib.SMTP('172.16.113.221:25')
-                    smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
+                    msg['To'] = recipient
+                    # smtpObj = smtplib.SMTP('172.16.113.221:25')
+                    # if msg['To'] == 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu,kamarjit@york.cuny.edu':
+                    #     # smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
+                    #     api.portal.send_email(recipient=msg['To'].split(','), sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
+                    api.portal.send_email(recipient=msg['To'], sender=msg['From'], subject=msg['Subject'], body=text, immediate=False)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
