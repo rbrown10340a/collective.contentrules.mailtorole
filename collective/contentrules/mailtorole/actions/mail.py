@@ -15,6 +15,7 @@ from zope import schema
 from zope.component import adapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import Interface, implementer
+import smtplib
 
 from email.mime.multipart import MIMEMultipart
 
@@ -229,10 +230,12 @@ action or enter an email in the portal properties")
             text = interpolator(self.element.message)
             for recipient in recipients_mail:
                 try:
-                    mailhost.send(
-                        text, recipient, msg['From'], subject=msg['Subject'],
-                        charset='utf-8', immediate=False, msg_type='text/html'
-                    )
+                    # mailhost.send(
+                    #     text, recipient, msg['From'], subject=msg['Subject'],
+                    #     charset='utf-8', immediate=False, msg_type='text/html'
+                    # )
+                    smtpObj = smtplib.SMTP('172.16.113.223:25')
+                    smtpObj.sendmail(msg["From"], recipient, text)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
