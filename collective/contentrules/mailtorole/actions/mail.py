@@ -21,18 +21,19 @@ from email.mime.multipart import MIMEMultipart
 
 from collective.contentrules.mailtorole import logger
 
-
 try:
     from plone.app.contentrules.actions import ActionAddForm as AddForm
     from plone.app.contentrules.actions import ActionEditForm as EditForm
     from plone.app.contentrules.browser.formhelper import \
         ContentRuleFormWrapper as FormWrapper
+
     IS_PLONE_5 = True
 except ImportError:
     from zope.formlib import form
     from plone.app.contentrules.browser.formhelper import AddForm, EditForm
     from plone.app.contentrules.browser.formhelper import _template
     from plone.z3cform.layout import FormWrapper
+
     IS_PLONE_5 = False
 
 
@@ -219,8 +220,8 @@ action or enter an email in the portal properties")
             if recipient_prop is not None and len(recipient_prop) > 0:
                 recipients_mail.add(recipient_prop)
 
-        # Prepend interpolated message with \n to avoid interpretation
-        # of first line as header.
+            # Prepend interpolated message with \n to avoid interpretation
+            # of first line as header.
             subject = interpolator(self.element.subject)
             message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
@@ -235,15 +236,17 @@ action or enter an email in the portal properties")
                     # try:
                     #     api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
                     # except:
+                    # smtpObj = smtplib.SMTP('172.16.113.221:25')
                     smtpObj = smtplib.SMTP('172.16.113.221:25')
                     smtpObj.sendmail(msg["From"], recipient, text)
+                    #     api.portal.send_email(sender=msg['From'], recipient=msg['To'].split(','), body=text, subject=msg['Subject'], immediate=False)
+                    #     api.portal.send_email(sender=msg['From'], recipient=recipient, body=text, subject=msg['Subject'], immediate=False)
                     # smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
                         'mail error: Attempt to send mail in content rule failed'
                     )
             return True
-
 
 
 class MailRoleAddForm(AddForm):
