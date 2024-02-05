@@ -226,7 +226,7 @@ action or enter an email in the portal properties")
             message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
             msg['From'] = source
-            msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu,kamarjit@york.cuny.edu'
+            # msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu,kamarjit@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             body = interpolator(self.element.message)
             msg.attach(MIMEText(body, 'plain'))
