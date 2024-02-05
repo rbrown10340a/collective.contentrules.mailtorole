@@ -18,7 +18,7 @@ from zope.interface import Interface, implementer
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import transaction
+
 from collective.contentrules.mailtorole import logger
 
 
@@ -183,10 +183,10 @@ action or enter an email in the portal properties")
         def _getGroupMemberIds(group):
             """ Helper method to support groups in groups. """
             members = []
-            for member_id in group.getGroupMemberIds():
-            # users = api.user.get_users()
-            # for member_user in users:
-            #     member_id = member_user.id
+            # for member_id in group.getGroupMemberIds():
+            users = api.user.get_users()
+            for member_user in users:
+                member_id = member_user.id
                 subgroup = group_tool.getGroupById(member_id)
                 if subgroup is not None:
                     members.extend(_getGroupMemberIds(subgroup))
@@ -221,20 +221,22 @@ action or enter an email in the portal properties")
 
         # Prepend interpolated message with \n to avoid interpretation
         # of first line as header.
-        #     subject = interpolator(self.element.subject)
-        #     message = "\n%s" % interpolator(self.element.message)
+            subject = interpolator(self.element.subject)
+            message = "\n%s" % interpolator(self.element.message)
             msg = MIMEMultipart()
             msg['From'] = source
-            # msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu,kamarjit@york.cuny.edu'
+            msg['To'] = 'rnunez@york.cuny.edu,etyrer@york.cuny.edu,rbrown12@york.cuny.edu'
             msg['Subject'] = interpolator(self.element.subject)
             body = interpolator(self.element.message)
             msg.attach(MIMEText(body, 'plain'))
             text = msg.as_string()
             for recipient in recipients_mail:
                 try:
-                    msg['To'] = recipient
+                    # try:
+                    #     api.portal.send_email(sender=source, recipient=recipient, body=message, subject=subject, immediate=False)
+                    # except:
                     smtpObj = smtplib.SMTP('172.16.113.221:25')
-                    smtpObj.sendmail(msg['From'], msg['To'], text)
+                    smtpObj.sendmail(msg["From"], recipient, text)
                     # smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
                 except (MailHostError, SMTPException):
                     logger.exception(
