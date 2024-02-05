@@ -183,10 +183,10 @@ action or enter an email in the portal properties")
         def _getGroupMemberIds(group):
             """ Helper method to support groups in groups. """
             members = []
-            # for member_id in group.getGroupMemberIds():
-            users = api.user.get_users()
-            for member_user in users:
-                member_id = member_user.id
+            for member_id in group.getGroupMemberIds():
+            # users = api.user.get_users()
+            # for member_user in users:
+            #     member_id = member_user.id
                 subgroup = group_tool.getGroupById(member_id)
                 if subgroup is not None:
                     members.extend(_getGroupMemberIds(subgroup))
