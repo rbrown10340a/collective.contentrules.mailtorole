@@ -229,7 +229,7 @@ action or enter an email in the portal properties")
             msg['Subject'] = interpolator(self.element.subject)
             body = interpolator(self.element.message)
             msg.attach(MIMEText(body, 'text/html'))
-            text = msg.as_string()
+            text = msg
             for recipient in recipients_mail:
                 try:
                     transaction.begin()
