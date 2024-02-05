@@ -238,8 +238,8 @@ action or enter an email in the portal properties")
                     # except:
                     # smtpObj = smtplib.SMTP('172.16.113.221:25')
                     smtpObj = smtplib.SMTP('172.16.113.221:25')
-                    if recipient:
-                        smtpObj.sendmail(msg["From"], recipient, text)
+                    # if recipient:
+                    #     smtpObj.sendmail(msg["From"], recipient, text)
                     #     api.portal.send_email(sender=msg['From'], recipient=msg['To'].split(','), body=text, subject=msg['Subject'], immediate=False)
                     #     api.portal.send_email(sender=msg['From'], recipient=recipient, body=text, subject=msg['Subject'], immediate=False)
                     smtpObj.sendmail(msg["From"], msg['To'].split(','), text)
